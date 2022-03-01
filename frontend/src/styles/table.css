@@ -1,0 +1,44 @@
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+}
+
+td,
+th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+th:hover {
+  cursor: pointer;
+}
+
+#table tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+.sort-active {
+  color: #0d1321;
+  margin-left: 5px;
+}
+
+.sort-inactive {
+  color: #ccc;
+  margin-left: 5px;
+}
+
+.search-heading {
+  padding: 0;
+}
+
+.search-input {
+  width: 100%;
+  height: 35px;
+  padding-left: 8px;
+  border: none;
+}
+
+.search-input:focus {
+  outline: none;
+}

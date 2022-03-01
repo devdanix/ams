@@ -1,0 +1,63 @@
+.mt {
+  margin-top: 20px;
+}
+
+.mr {
+  margin-right: 20px;
+}
+
+.mb {
+  margin-bottom: 20px;
+}
+
+.ml {
+  margin-left: 20px;
+}
+
+.mt-x2 {
+  margin-top: 40px;
+}
+
+.mr-x2 {
+  margin-right: 40px;
+}
+
+.mb-x2 {
+  margin-bottom: 40px;
+}
+
+.ml-x2 {
+  margin-left: 40px;
+}
+
+.mtz {
+  margin-top: 0px;
+}
+
+.mrz {
+  margin-right: 0px;
+}
+
+.mbz {
+  margin-bottom: 0px;
+}
+
+.mlz {
+  margin-left: 0px;
+}
+
+.mt-p10 {
+  margin-top: 10%;
+}
+
+.mr-p10 {
+  margin-right: 10%;
+}
+
+.mb-p10 {
+  margin-bottom: 10%;
+}
+
+.ml-p10 {
+  margin-left: 10%;
+}

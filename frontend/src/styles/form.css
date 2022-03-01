@@ -1,0 +1,103 @@
+.form-wrapper {
+  padding: 30px;
+  background-color: #fff;
+}
+
+.form-title {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.form-text {
+  margin: 0px auto 50px auto;
+  width: 80%;
+}
+
+.entry-wrapper {
+  margin-top: 30px;
+  margin-bottom: 50px;
+  width: 100%;
+}
+
+label {
+  margin-left: 5px;
+}
+
+.label {
+  position: absolute;
+  left: 1%;
+  top: 30%;
+  font-size: 16px;
+  font-weight: 200;
+  color: #969393;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  margin-left: 2%;
+}
+
+input[type="text"]:focus ~ .label,
+input[type="date"]:focus ~ .label,
+input[type="datetime-local"]:focus ~ .label,
+input[type="password"]:focus ~ .label {
+  display: block;
+  color: #1976d2;
+  top: -8px;
+  font-size: 14px;
+  padding: 0 5px;
+  background-color: #fff;
+  margin-left: 2%;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="password"] {
+  outline: none;
+  border-radius: 5px;
+  border: 1px solid #cecece;
+  height: 50px;
+  width: 100%;
+  padding: 5px;
+  padding-left: 21px;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+input[type="datetime-local"]:focus,
+input[type="password"]:focus {
+  content: "";
+  border: 2px solid #1976d2;
+  transition: all 0.1 ease;
+}
+
+input[type="date"],
+input[type="datetime-local"] {
+  cursor: pointer;
+}
+
+input[type="date"] *,
+input[type="datetime-local"] * {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Chrome/Safari/Opera */
+  -khtml-user-select: none; /* Konqueror */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently */
+}
+
+.not-empty {
+  display: block;
+  color: #969393;
+  top: -8px;
+  font-size: 14px;
+  padding: 0 5px;
+  background-color: #fff;
+}
+
+#form-login {
+  width: 25%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  margin-top: 3%;
+}

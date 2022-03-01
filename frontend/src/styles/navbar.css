@@ -1,0 +1,50 @@
+.nav {
+  width: 185px;
+  min-height: 100vh;
+  background-color: #0d1321;
+}
+
+.nav-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.nav-item {
+  width: 100%;
+  min-height: 50px;
+  padding: 15px 0 0px 20px;
+}
+
+.nav-item a {
+  color: #fff;
+}
+
+.func-list {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: end;
+}
+
+.nav-logo {
+  color: #fff;
+  font-size: 22px;
+}
+
+.nav svg {
+  color: #fff;
+  font-size: 18px;
+  margin-right: 5px;
+}
+
+.top-navbar-wrapper {
+  background-color: rgb(66, 90, 119);
+  height: 50px;
+}
+
+.top-navbar-title {
+  padding: 0.6% 0%;
+  color: #fff;
+}
