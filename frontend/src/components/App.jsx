@@ -13,6 +13,8 @@ import Register from './user/Register.jsx';
 import ResetPassword from './user/ResetPassword.jsx';
 import Dashboard from './Dashboard.jsx';
 import Companies from './Companies.jsx';
+import Picker from './Picker.jsx';
+import Profile from './Profile.jsx';
 
 function App() {
 
@@ -73,15 +75,9 @@ function App() {
         <Navbar/>
         <Routes>
           <Route path="/" element={<Dashboard setUserToken={setUserToken} userID={userID}/>} />
-        </Routes>
-        <Routes>
           <Route path="/calendar" element={<Calendar setUserToken={setUserToken} showNotification={showNotification} userID={userID}/>} />
-        </Routes>
-        <Routes>
           <Route path="/companies" element={<Companies setUserToken={setUserToken} showNotification={showNotification} userID={userID}/>} />
-        </Routes>
-        <Routes>
-          <Route path="/profile" element={<Calendar setUserToken={setUserToken} userID={userID}/>} />
+          <Route path="/profile" element={<Profile showNotification={showNotification} setUserToken={setUserToken} userID={userID}/>} />
         </Routes>
       </>
       )
@@ -91,11 +87,16 @@ function App() {
   return (
     <>
       <div id="notification" />
-      {/* <BrowserRouter>
-        {getRoutes()}
-      </BrowserRouter> */}
+      <BrowserRouter>
+      <Navbar/>
+        {/* {getRoutes()} */}
+      </BrowserRouter>
 
-      <Calendar showNotification={showNotification} setUserToken={setUserToken} userID={userID}/>
+      {/* <Calendar showNotification={showNotification} setUserToken={setUserToken} userID={userID}/> */}
+      {/* <Dashboard showNotification={showNotification} setUserToken={setUserToken} userID={userID}/> */}
+      {/* <Companies setUserToken={setUserToken} showNotification={showNotification} userID={userID}/> */}
+      <Profile setUserToken={setUserToken} showNotification={showNotification} userID={userID}/>
+
     </>
   )
 }

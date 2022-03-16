@@ -67,3 +67,15 @@ button {
 .no-btn {
   background-color: #b6bece;
 }
+
+.clear-input {
+  position: absolute;
+  top: 1em;
+  right: 2em;
+  color: #b2b2b2;
+}
+
+.clear-input:hover {
+  cursor: pointer;
+  color: #6e6d6d;
+}

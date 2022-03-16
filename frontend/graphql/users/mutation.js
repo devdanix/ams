@@ -64,3 +64,17 @@ export const PASSWORD_RESET = gql`
     }
   }
 `
+export const UPDATE_USER = gql`
+  mutation updateUser($userID:Int, $username:String, $email:String, $firstName:String, $lastName:String ){
+    userUpdate(userID:$userID, username:$username, email:$email, firstName:$firstName, lastName:$lastName){
+      errors,
+      user{
+        pk,
+        username,
+        email
+        lastName
+        firstName
+      }
+    }
+  }
+`

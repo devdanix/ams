@@ -30,7 +30,7 @@ export default function Table(props) {
   const currentTableData = (data) => {
     const pageFrom = currentPage == 0 ? 0 : currentPage * pageSize
     const pageTo = currentPage == 0 ? pageSize : (currentPage * pageSize) + pageSize
-    return data.slice(pageFrom, pageTo);
+    return data.slice(pageFrom , pageTo);
   }
 
   const getPropByString = (obj, propString) => {
@@ -125,8 +125,8 @@ export default function Table(props) {
     setInputFilter(prevState => ({ ...prevState, [heading]: value }))
     setCurrentInputFilterValue(value)
     setCurrentInputFilterHeading(heading)
-
   }
+
   useEffect(() => {
     let result = props.rows
     let loopTable = []
@@ -175,22 +175,24 @@ export default function Table(props) {
 
   const tableHeadings = props.heading.map((heading, index) => {
     let sortIcon, sortIconClass = ''
-    if (prevSort == heading.header.toLowerCase() && sort == 'asc') {
-      sortIcon = 'faSortUp'
-      sortIconClass = 'sort-active'
-    } else if (prevSort == heading.header.toLowerCase() && sort == 'desc') {
-      sortIcon = 'faSortDown'
-      sortIconClass = 'sort-active'
-    } else if (heading.header) {
-      sortIcon = 'faSort'
-      sortIconClass = 'sort-inactive'
+    if (heading.allowSort) {
+      if (prevSort == heading.header.toLowerCase() && sort == 'asc') {
+        sortIcon = 'faSortUp'
+        sortIconClass = 'sort-active'
+      } else if (prevSort == heading.header.toLowerCase() && sort == 'desc') {
+        sortIcon = 'faSortDown'
+        sortIconClass = 'sort-active'
+      } else if (heading.header) {
+        sortIcon = 'faSort'
+        sortIconClass = 'sort-inactive'
+      }
     }
 
     return (
       <th
         key={index}
         onClick={() => {
-          heading.header ?
+          heading.header && heading.allowSort  ?
           sortTable(heading.sortBy, heading.subKey) :
           ''
           }}
@@ -209,7 +211,12 @@ export default function Table(props) {
 
       if (item.type == 'field') {
         return (
-          <td className={item.tdClassName} key={index}>{getPropByString(record, item.name)}</td>
+          <td
+            className={item.tdClassName}
+            key={index}
+          >
+            {getPropByString(record, item.name)}
+          </td>
         )
       } else if (item.type == 'button') {
         let buttons = item.items.map((btn, index) => {
@@ -242,18 +249,20 @@ export default function Table(props) {
       }
     })
     return (
-      <tr key={index}>{field}</tr>
+      <tr key={index} onClick={props.onClickTr}>{field}</tr>
     )
   })
 
   return (
-    <div id="table">
+    <div id="table" style={props.tableWrapperStyle}>
+      {props.showPagination ?
       <Pagination
         data={filterTable}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         pageSize={pageSize}
-      />
+      /> : ''
+      }
       <table id={tableID} className={props.className}>
         <thead>
           <tr>

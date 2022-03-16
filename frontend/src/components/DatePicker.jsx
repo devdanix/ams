@@ -13,8 +13,6 @@ export default function DatePicker({
   setCalendarState = f => f,
 }) {
 
-
-
   let oneDay = 60 * 60 * 24 * 1000;
   let todayTimestamp = Date.now() - (Date.now() % oneDay) + (new Date().getTimezoneOffset() * 1000 * 60);
   let dateToSetTimestamp = dateToSet - (dateToSet % oneDay) + (dateToSet.getTimezoneOffset() * 1000 * 60)
@@ -40,10 +38,6 @@ export default function DatePicker({
   const [ time, setTime ] = useState(getHoursStringFromTimestamp(selectedTimestamp))
   const [ showDatePicker, setShowDatePicker ] = useState(false)
   const [ state, setState ] = useState('')
-
-  console.log(state)
-  console.log(time)
-
 
   useEffect(() => {
     window.addEventListener('click', addBackDrop)

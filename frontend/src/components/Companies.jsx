@@ -3,16 +3,6 @@ import ReactDOM from 'react-dom';
 import { useQuery, useMutation } from '@apollo/client'
 import { v4 as uuidv4 } from 'uuid';
 
-// Redux
-// import { useDispatch, useSelector } from 'react-redux'
-// import { showNotificationAction } from '../store/notification';
-// import { setDataAction } from '../store/table';
-
-// // Font awesome
-// import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
-// import { faEdit } from '@fortawesome/free-solid-svg-icons'
-
-
 // Graphql
 import { GET_COMPANIES, GET_COMPANY } from '../../graphql/companies/query'
 import { DELETE_COMPANY, ADD_COMPANY } from '../../graphql/companies/mutation'
@@ -236,19 +226,23 @@ export default function Companies({
       sortBy: 'id',
       style: {
         width: '200px'
-      }
+      },
+      allowSort: true,
     },
     {
       header: 'Name',
-      sortBy: 'name'
+      sortBy: 'name',
+      allowSort: true,
     },
     {
       header: 'Website',
-      sortBy: 'website'
+      sortBy: 'website',
+      allowSort: true,
     },
     {
       header: 'Telephone',
-      sortBy: 'telephone'
+      sortBy: 'telephone',
+      allowSort: true,
     },
     {
       header: '',
@@ -303,7 +297,7 @@ export default function Companies({
       <div className="centered w-95 flex fdc">
         <div className="mt mb w-100 flex jcsb">
           <div id="modalWindowContainer" />
-          <Button
+          {/* <Button
             key={uuidv4()}
             id={'add-company-btn'}
             className="btn add-company-btn centered"
@@ -315,7 +309,7 @@ export default function Companies({
             iconClassName=""
             icon=''
             style={{ width: '150px' }}
-          />
+          /> */}
         </div>
         <div>
           <Table
@@ -325,6 +319,7 @@ export default function Companies({
             rows={data.allCompanies}
             content={tableContent}
             pageSize={pageSize}
+            showPagination={true}
           />
         </div>
       </div>

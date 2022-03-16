@@ -4,7 +4,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './styles/index.css';
 import App from './components/App.jsx';
-// import Notification from './components/base/Notification.jsx';
+
+import { createUploadLink } from 'apollo-upload-client'
 
 import {
   ApolloProvider,
@@ -15,9 +16,12 @@ import {
 
 import { setContext } from '@apollo/client/link/context';
 
-const httpLink = createHttpLink({
+const httpLink = createUploadLink({
   uri: 'http://127.0.0.1:8001/graphql'
 });
+// const httpLink = createHttpLink({
+//   uri: 'http://127.0.0.1:8001/graphql'
+// });
 
 const authLink = setContext((_, { headers }) => {
   // get the authentication token from local storage if it exists

@@ -2,12 +2,14 @@ import React from 'react'
 import classnames from 'classnames';
 import { v4 as uuidv4 } from 'uuid';
 
-export default function Pagination(props) {
+export default function Pagination({
+  pageSize = '',
+  currentPage = '',
+  data = '',
+  setCurrentPage = f => f
+}) {
 
-  const pageSize = props.pageSize
-  const currentPage = props.currentPage
-  const setCurrentPage = props.setCurrentPage
-  const totalPageCount = Math.round(props.data.length / pageSize )
+  const totalPageCount = Math.round(data.length / pageSize )
   const siblingsCount = 1
   const totalPageNumbers = siblingsCount + 5
   const DOTS = '...'

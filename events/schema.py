@@ -1,11 +1,13 @@
 
 import graphene
+from datetime import datetime, timedelta
 
 from graphene_django import DjangoObjectType
 # from graphql_jwt.decorators import login_required
 
 from .models import Events
 from users.models import CustomUser
+from companies.models import Companies
 from django.contrib.auth import get_user_model
 
 class UserType(DjangoObjectType):
@@ -24,6 +26,8 @@ class EventType(DjangoObjectType):
 class Query(graphene.ObjectType):
     single_event = graphene.Field(EventType, id=graphene.Int())
     user_events = graphene.List(EventType, id=graphene.Int())
+    user_events_this_week = graphene.List(EventType, id=graphene.Int())
+    user_events_next_week = graphene.List(EventType, id=graphene.Int())
     all_events = graphene.List(EventType)
 
     # @login_required
@@ -38,6 +42,24 @@ class Query(graphene.ObjectType):
     def resolve_user_events(root, info, id):
         return Events.objects.filter(userFK=id)
 
+    def resolve_user_events_this_week(root, info, id):
+        now = datetime.now()
+        monday = now - timedelta(days = now.weekday())
+        next_monday = now + timedelta(days = 7 - now.weekday() )
+        monday = monday.replace(hour=0, minute=0, second=0, microsecond=0)
+        next_monday = next_monday.replace(hour=0, minute=0, second=0, microsecond=0)
+
+        return Events.objects.filter(userFK=id, start__range=[monday, next_monday], end__range=[monday, next_monday])
+
+    def resolve_user_events_next_week(root, info, id):
+        now = datetime.now()
+        next_monday = now + timedelta(days = 7 - now.weekday() )
+        monday_after = now + timedelta(days = 14 - now.weekday())
+        next_monday = next_monday.replace(hour=0, minute=0, second=0, microsecond=0)
+        monday_after = monday_after.replace(hour=0, minute=0, second=0, microsecond=0)
+
+        return Events.objects.filter(userFK=id, start__range=[next_monday, monday_after], end__range=[next_monday, monday_after])
+
 
 class EventAddMutation(graphene.Mutation):
     class Arguments:
@@ -46,14 +68,16 @@ class EventAddMutation(graphene.Mutation):
         start = graphene.types.datetime.DateTime(required=True)
         end = graphene.types.datetime.DateTime(required=True)
         userFK = graphene.Int(required=True)
+        companyFK = graphene.Int(required=False)
 
 
     event = graphene.Field(EventType)
 
     # @login_required
-    def mutate(root, info, title, allDay, start, end, userFK ):
+    def mutate(root, info, title, allDay, start, end, userFK, companyFK ):
         user_obj = CustomUser.objects.get(id=userFK)
-        event = Events(title=title, allDay=allDay, start=start, end=end, userFK=user_obj)
+        company_obj = Companies.objects.get(id=companyFK)
+        event = Events(title=title, allDay=allDay, start=start, end=end, userFK=user_obj, companyFK=company_obj )
 
 
         event.save()
@@ -84,12 +108,16 @@ class EventUpdateMutation(graphene.Mutation):
         allDay = graphene.Boolean(required=True)
         start = graphene.types.datetime.DateTime(required=True)
         end = graphene.types.datetime.DateTime(required=True)
+        userFK = graphene.Int(required=True)
+        companyFK = graphene.Int(required=False)
 
     event = graphene.Field(EventType)
 
     # @login_required
-    def mutate(root, info, id, title, allDay, start, end):
+    def mutate(root, info, id, title, allDay, start, end, userFK, companyFK):
         # Get single company from DB where PK = ID
+        user_obj = CustomUser.objects.get(id=userFK)
+        company_obj = Companies.objects.get(id=companyFK)
         event = Events.objects.get(pk=id)
 
         # Update event
@@ -99,6 +127,8 @@ class EventUpdateMutation(graphene.Mutation):
         event.allDay = allDay
         event.start = start
         event.end = end
+        event.userFK = user_obj
+        event.companyFK = company_obj
 
         # Save to DB
         event.save()

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useQuery, useMutation } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { v4 as uuidv4 } from 'uuid';
 
 // Custom Hooks
@@ -15,10 +15,10 @@ import interactionPlugin from '@fullcalendar/interaction'; // for selectable
 import TopNavbar from './TopNavbar.jsx'
 // import ModalWindow from './ModalWindow.jsx'
 import DatePicker from './DatePicker.jsx';
-import Button from './Button.jsx';
+import Picker from './Picker.jsx';
 
 // Graphql
-import { GET_EVENTS, USER_EVENTS } from '../../graphql/events/query';
+import { USER_EVENTS } from '../../graphql/events/query';
 import { UPDATE_EVENT, ADD_EVENT, DELETE_EVENT } from '../../graphql/events/mutation';
 
 
@@ -54,7 +54,7 @@ export default function Calendar({
     ],
   })
 
-  const [ deleteEventMutation ] = useMutation(DELETE_EVENT, {
+  const deleteEventMutation = useCleanMutation(DELETE_EVENT, {
     onCompleted(data) {
       closeModalWindow()
       const extraClass = "notification-success"
@@ -74,10 +74,9 @@ export default function Calendar({
     ],
   })
 
-  const [ addEventMutation ] = useMutation(ADD_EVENT, {
+  const addEventMutation = useCleanMutation(ADD_EVENT, {
     onCompleted(data) {
       closeModalWindow()
-      console.log('here')
       const extraClass = "notification-success"
       const title = "Add Event"
       const message = `The new event has been added correctly.`
@@ -122,11 +121,16 @@ export default function Calendar({
     }));
   }
 
+  const handleOnChangeCompany = (value) => {
+    setState(prevState => ({
+       ...prevState,
+       company: value
+    }));
+  }
+
   const showDropDown = (id) => {
     document.getElementById(id).classList.toggle("show");
   }
-
-  console.log(state)
 
   const addEventForm = () => {
     if (state.startDate && state.endDate) {
@@ -198,34 +202,20 @@ export default function Calendar({
                 }
               </div>
             </div>
-            <div>
-              {/* <Button
-                className='btn login-btn centered'
-                label='Add Event'
-                function={addEventMutation}
-                variables={['title', 'allDay', 'start', 'end', 'userID']}
-                param= {{ variables: { title: state.title, allDay: state.allDay, start: state.startDate.toISOString(), end: state.endDate.toISOString(), userID: userID }}}
-                iconClassName=""
-                icon=''
-                disabled={!state.title || state.startDate > state.endDate ? true : false}
-              /> */}
-              <button
-                className='btn login-btn centered w-100'
-                onClick={(e) => {
-                  e.preventDefault()
-                  addEventMutation({
-                    title: state.title,
-                    allDay: state.allDay,
-                    start: state.startDate.toISOString(),
-                    end: state.endDate.toISOString(),
-                    userID: userID
-                  })}
-                }
-                disabled={!state.title || state.startDate > state.endDate ? true : false}
-                >
-                  Add Event
-              </button>
-            </div>
+            <button
+              className='btn login-btn centered w-100'
+              onClick={(e) => {
+                e.preventDefault()
+                addEventMutation({
+                  title: state.title,
+                  allDay: state.allDay,
+                  start: state.startDate.toISOString(),
+                  end: state.endDate.toISOString(),
+                  userID: userID || 1
+                })}
+              }
+              disabled={!state.title || state.startDate > state.endDate ? true : false}
+            >Add Event</button>
           </form>
         </div>
       )
@@ -269,6 +259,14 @@ export default function Calendar({
                 Title
             </label>
           </div>
+          <Picker
+            inputLabel='company'
+            inputId = 'company'
+            labelId = 'company-label'
+            labelText = 'Company'
+            handleOnChangeParent={handleOnChangeCompany}
+            companyValue= {state.companyName}
+          />
           <div className='flex jcsb'>
             <DatePicker
               className='entry-wrapper relative datepicker-form-width'
@@ -303,75 +301,59 @@ export default function Calendar({
             </div>
           </div>
           <div className='flex jcsb'>
-            <div className="dropdown" style={{width:'40%'}}>
-              <Button
-                function={showDropDown}
-                label='Cancel Event'
-                funcParam='cancelEventDropdown'
-                className="btn login-btn centered w-100"
-                iconClassName=''
-                icon=''
-                variables=''
-                param=''
-              />
-              <div className="dropdown-content dropdown-content-event" id={'cancelEventDropdown'}>
+            <div className="dropdown w-40">
+              <button
+                className='btn login-btn centered w-100'
+                onClick={(e) => {
+                  e.preventDefault()
+                  showDropDown('cancelEventDropdown')
+                }}
+              >Cancel Event</button>
+              <div className="dropdown-content dropdown-content-event" id='cancelEventDropdown'>
                 <p>Are you sure you want to delete this event?</p>
                 <div className='flex'>
-                  <Button
-                    className='btn dropdown-button cancel-btn login-btn centered w-100'
-                    label='Yes'
-                    function={deleteEventMutation}
-                    variables={['id']}
-                    param= {{ variables: { id: state.eventID }}}
-                    iconClassName=""
-                    icon=''
-                    style={{width: '50%'}}
-                  />
-                  <Button
-                    className='btn dropdown-button no-btn login-btn centered w-100'
-                    label='No'
-                    function={() => document.getElementById('cancelEventDropdown').classList.remove("show")}
-                    variables=''
-                    param= ''
-                    iconClassName=""
-                    icon=''
-                    style={{width: '50%'}}
-                  />
+                  <button
+                    className='btn dropdown-button cancel-btn login-btn w-50'
+                    onClick={(e) => {
+                      e.preventDefault()
+                      deleteEventMutation({ id: state.eventID })
+                    }}
+                  >Yes</button>
+                  <button
+                    className='btn dropdown-button no-btn login-btn w-50'
+                    onClick={(e) => {
+                      e.preventDefault()
+                      document.getElementById('cancelEventDropdown').classList.remove("show")
+                    }}
+                  >No</button>
                 </div>
               </div>
             </div>
-              <button
-                className='btn login-btn w-40'
-                onClick={(e) => {
-                  e.preventDefault()
-                  updateEventMutation({
-                    id: state.eventID,
-                    title: state.title,
-                    allDay: state.allDay,
-                    start: state.startDate.toISOString(),
-                    end: state.endDate.toISOString(),
-                    userID: userID
-                  })}
-                }
-                disabled={!state.title || state.startDate > state.endDate ? true : false}
-                >
-                  Ok
-              </button>
+            <button
+              className='btn login-btn w-40'
+              onClick={(e) => {
+                e.preventDefault()
+                updateEventMutation({
+                  id: state.eventID,
+                  title: state.title,
+                  allDay: state.allDay,
+                  start: state.startDate.toISOString(),
+                  end: state.endDate.toISOString(),
+                  userID: userID || 1,
+                  companyID: state.company
+                })}
+              }
+              disabled={!state.title || state.startDate > state.endDate ? true : false}
+            >Ok</button>
           </div>
         </form>
       </div>
     )
   }
 
-  // const { loading, error, data } = useQuery(USER_EVENTS, {
-  //   variables: { userID: userID }
-  // });
-
   const { loading, error, data } = useQuery(USER_EVENTS, {
-    variables: { userID: 1 }
+    variables: { userID: userID || 1}
   });
-
-  // const { loading, error, data } = useQuery(GET_EVENTS);
 
   if (loading) return 'Loading...';
   if (error) return `Error! ${error.message}`;
@@ -448,11 +430,13 @@ export default function Calendar({
           }}
           eventResize={info => {
             let variables = {
-                id: info.event.id,
-                title: info.event.title,
-                allDay: false,
-                start: info.event.start.toISOString(),
-                end: info.event.end ? info.event.end.toISOString() : info.event.start.toISOString()
+              id: info.event.id,
+              title: info.event.title,
+              allDay: false,
+              start: info.event.start.toISOString(),
+              end: info.event.end ? info.event.end.toISOString() : info.event.start.toISOString(),
+              userID: userID || 1,
+              companyID: info.event._def.extendedProps.companyFK.id,
             }
             if(info.event.allDay){
               variables.allDay = true
@@ -462,11 +446,13 @@ export default function Calendar({
           }}
           eventDrop={info => {
             let variables = {
-                id: info.event.id,
-                title: info.event.title,
-                allDay: false,
-                start: info.event.start.toISOString(),
-                end: info.event.end ? info.event.end.toISOString() : info.event.start.toISOString()
+              id: info.event.id,
+              title: info.event.title,
+              allDay: false,
+              start: info.event.start.toISOString(),
+              end: info.event.end ? info.event.end.toISOString() : info.event.start.toISOString(),
+              userID: userID || 1,
+              companyID: info.event._def.extendedProps.companyFK.id,
             }
             if(info.event.allDay){
               variables.allDay = true
@@ -478,6 +464,7 @@ export default function Calendar({
               info.event.setEnd(tempDate)
               variables.end = info.event.end.toISOString()
             }
+            console.log(info)
             updateEventMutation(variables)
           }}
           eventClick={info => {
@@ -488,7 +475,9 @@ export default function Calendar({
               eventID: info.event._def.publicId,
               startDate: new Date(info.event._instance.range.start.toISOString()),
               endDate: new Date(info.event._instance.range.end.toISOString()),
-              onClickEvent: true
+              onClickEvent: true,
+              company: info.event._def.extendedProps.companyFK.id,
+              companyName: info.event._def.extendedProps.companyFK.name
             }));
             renderModalWindow(info)
           }}

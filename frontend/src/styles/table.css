@@ -14,8 +14,17 @@ th:hover {
   cursor: pointer;
 }
 
+table[id^="table"] tbody tr:hover {
+  background-color: #dcf2ff !important;
+  cursor: pointer;
+}
+
+table[id^="table"] tr:hover td:nth-child(n) {
+  border-right: 1px solid #dcf2ff !important;
+}
+
 #table tr:nth-child(even) {
-  background-color: #dddddd;
+  background-color: #f1f1f1;
 }
 
 .sort-active {

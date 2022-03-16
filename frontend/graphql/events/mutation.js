@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client'
 
 export const UPDATE_EVENT = gql`
-  mutation updateEvent($id:ID!, $title:String!, $allDay:Boolean!, $start:DateTime!, $end:DateTime! ){
-    updateEvent(id: $id, title: $title, allDay: $allDay, end: $end, start: $start ){
+  mutation updateEvent($id:ID!, $title:String!, $allDay:Boolean!, $start:DateTime!, $end:DateTime!, $userID: Int!, $companyID: Int ){
+    updateEvent(id: $id, title: $title, allDay: $allDay, end: $end, start: $start, userFK: $userID, companyFK: $companyID ){
       event{
         id
         title
@@ -16,8 +16,8 @@ export const UPDATE_EVENT = gql`
 
 
 export const ADD_EVENT = gql`
-  mutation addEvent($title: String!, $allDay: Boolean!, $start: DateTime!, $end:DateTime!, $userID: Int!){
-    addEvent(title: $title, allDay: $allDay, start:$start, end: $end, userFK: $userID){
+  mutation addEvent($title: String!, $allDay: Boolean!, $start: DateTime!, $end:DateTime!, $userID: Int!, $companyID: Int){
+    addEvent(title: $title, allDay: $allDay, start:$start, end: $end, userFK: $userID, companyFK: $companyID){
       event{
         id
         title

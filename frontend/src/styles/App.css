@@ -57,8 +57,16 @@ ul {
   width: 90%;
 }
 
+.w-50 {
+  width: 50%;
+}
+
 .w-40 {
   width: 40%;
+}
+
+.w-30 {
+  width: 30%;
 }
 
 .w-10 {
@@ -106,4 +114,9 @@ ul {
   margin-left: 5%;
   margin-top: 5%;
   box-shadow: 5px 5px #ccc;
+}
+
+.user-img {
+  width: 100px;
+  border-radius: 50%;
 }
