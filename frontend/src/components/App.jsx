@@ -72,17 +72,10 @@ function App() {
   return (
     <>
       <div id="notification" />
-      {/* <BrowserRouter> */}
-        {/* <Navbar/> */}
-          {/* {getRoutes()} */}
-       {/* </BrowserRouter> */}
-
-      {/* <Calendar /> */}
-      {/* <Dashboard /> */}
-      {/* <Companies /> */}
-      {/* <Profile /> */}
-      <Users />
-
+      <BrowserRouter>
+        <Navbar/>
+          {getRoutes()}
+       </BrowserRouter>
     </>
   )
 }
