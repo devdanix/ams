@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 // Icons
 import { BsCalendar3 } from 'react-icons/bs'
 import { AiOutlineDashboard } from 'react-icons/ai'
-import { FaRegBuilding, FaUser } from 'react-icons/fa'
+import { FaRegBuilding, FaUser, FaUsers } from 'react-icons/fa'
 
 export default function Navbar() {
 
@@ -27,6 +27,10 @@ export default function Navbar() {
           <li className="nav-item">
             <FaRegBuilding className='' />
             <Link to="/companies">Companies</Link>
+          </li>
+          <li className="nav-item">
+            <FaUsers className='' />
+            <Link to="/users">Users</Link>
           </li>
           <li className="nav-item">
             <FaUser className='' />

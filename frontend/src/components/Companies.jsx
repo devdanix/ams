@@ -7,6 +7,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { GET_COMPANIES, GET_COMPANY } from '../../graphql/companies/query'
 import { DELETE_COMPANY, ADD_COMPANY } from '../../graphql/companies/mutation'
 
+// Custom Hooks
+import { useNotification } from '../../graphql/hooks/useNotification.js';
+
 // Components
 import Form from './Form.jsx';
 import Table from './Table.jsx';
@@ -14,12 +17,8 @@ import ModalWindow from './ModalWindow.jsx'
 import Button from './Button.jsx';
 import Pagination from './Pagination.jsx';
 import TopNavbar from './TopNavbar.jsx';
-import { set } from 'lodash';
 
-export default function Companies({
-  showNotification = f => f,
-  userID = ''
-}) {
+export default function Companies() {
 
   const [ pageSize, setPageSize ] = useState(17)
 
@@ -30,13 +29,13 @@ export default function Companies({
       const extraClass = "notification-success"
       const title = "Add Company"
       const message = `The company has been added.`
-      showNotification(extraClass, title, message)
+      useNotification(extraClass, title, message)
     },
     onError(){
       const extraClass = "notification-error"
       const title = "Add Company Error"
       const message = `Has not been possible to add the new company.`
-      showNotification(extraClass, title, message)
+      useNotification(extraClass, title, message)
     },
     refetchQueries: [
       {
@@ -51,7 +50,7 @@ export default function Companies({
       const extraClass = "notification-success"
       const title = "Delete Company"
       const message = `The company has been deleted.`
-      showNotification(extraClass, title, message)
+      useNotification(extraClass, title, message)
     },
     refetchQueries: [
       {
@@ -152,6 +151,9 @@ export default function Companies({
 
   if (loading) return 'Loading...';
   if (error) return `Error! ${error.message}`;
+
+
+  console.log(data.allCompanies)
 
   // Form
   const formValues = [

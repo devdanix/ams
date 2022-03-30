@@ -1,11 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import ReactDOM from 'react-dom';
+import React, { useRef, useContext } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 
 // Components
 import Login from './user/Login.jsx';
-import Notification from './Notification.jsx';
 import Calendar from './Calendar.jsx'
 import Navbar from './Navbar.jsx';
 import Activation from './user/Activation.jsx';
@@ -13,59 +11,45 @@ import Register from './user/Register.jsx';
 import ResetPassword from './user/ResetPassword.jsx';
 import Dashboard from './Dashboard.jsx';
 import Companies from './Companies.jsx';
-import Picker from './Picker.jsx';
 import Profile from './Profile.jsx';
+import Users from './Users.jsx';
+
+// Context
+import { GlobalContext } from './context/GlobalProvider.js';
+
 
 function App() {
 
-  const [ userToken, setUserToken ] = useState('')
-  const [ userID, setUserID ] = useState('')
-  const [ isLogin, setIsLogin ] = useState(true)
+  const { userToken, userIDContext, isLogin } = useContext(GlobalContext)
+  const [ userTokenValue, setUserToken ] = userToken
+  const [ userIDValue, setUserIDValue ] = userIDContext
+  const [ isLoginValue, setIsLogin ] = isLogin
+
+
+  console.log(userTokenValue, userIDValue, isLoginValue)
+  // const [ userToken, setUserToken ] = useState('')
+  // const [ userID, setUserID ] = useState('')
+  // const [ isLogin, setIsLogin ] = useState(true)
   let locationCheck = window.location.pathname.includes('activate') || window.location.pathname.includes('password-reset')
 
   const inputRef = useRef('')
 
-  // useEffect(() => {
-  //   inputRef.current.focus();
-  // }, []);
-
-  // Notification Functions
-  const showNotification = (extraClass, title, message) => {
-    const elem = document.querySelector('#notification');
-    ReactDOM.render(
-      <Notification extraClass={extraClass} title={title} message={message}/>
-      , elem);
-    setTimeout(() => {
-      document.getElementById('notification-wrapper').classList.remove('visible')
-      document.getElementById('notification-wrapper').classList.add('invisible')
-    }
-    , 3000)
-    setTimeout(() => unmountWindow(), 3500)
-  }
-
-  const unmountWindow = () => {
-    const elem = document.querySelector('#notification');
-    ReactDOM.unmountComponentAtNode(elem)
-  }
-
   const getRoutes = () => {
-    if(!userToken && !locationCheck && isLogin ) {
-      return <Login showNotification={showNotification} setUserToken={setUserToken} inputRef={inputRef} setIsLogin={setIsLogin} setUserID={setUserID}/>
-    } else if (!userToken && !locationCheck && !isLogin) {
+    if(!userTokenValue && !locationCheck && isLoginValue ) {
+      return <Login inputRef={inputRef} />
+    } else if (!userTokenValue && !locationCheck && !isLoginValue ) {
        return (
         <Routes>
-          <Route path="/register" element={<Register showNotification={showNotification} setUserToken={setUserToken} setIsLogin={setIsLogin}/>} />
+          <Route path="/register" element={<Register />} />
         </Routes>
        )
     } else if (locationCheck) {
       return (
         <>
           <Routes>
-            <Route path="/activate/:token" element={<Activation showNotification={showNotification} setIsLogin={setIsLogin}/>} />
-          </Routes>
-          <Routes>
-            <Route path="/password-reset/:token" element={<ResetPassword showNotification={showNotification} />} />
-            <Route path="/password-reset/" element={<ResetPassword showNotification={showNotification} />} />
+            <Route path="/activate/:token" element={<Activation />} />
+            <Route path="/password-reset/:token" element={<ResetPassword />} />
+            <Route path="/password-reset/" element={<ResetPassword />} />
           </Routes>
         </>
       )
@@ -74,10 +58,11 @@ function App() {
       <>
         <Navbar/>
         <Routes>
-          <Route path="/" element={<Dashboard setUserToken={setUserToken} userID={userID}/>} />
-          <Route path="/calendar" element={<Calendar setUserToken={setUserToken} showNotification={showNotification} userID={userID}/>} />
-          <Route path="/companies" element={<Companies setUserToken={setUserToken} showNotification={showNotification} userID={userID}/>} />
-          <Route path="/profile" element={<Profile showNotification={showNotification} setUserToken={setUserToken} userID={userID}/>} />
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/calendar" element={<Calendar />} />
+          <Route path="/companies" element={<Companies />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/users" element={<Users />} />
         </Routes>
       </>
       )
@@ -87,15 +72,16 @@ function App() {
   return (
     <>
       <div id="notification" />
-      <BrowserRouter>
-      <Navbar/>
-        {/* {getRoutes()} */}
-      </BrowserRouter>
+      {/* <BrowserRouter> */}
+        {/* <Navbar/> */}
+          {/* {getRoutes()} */}
+       {/* </BrowserRouter> */}
 
-      {/* <Calendar showNotification={showNotification} setUserToken={setUserToken} userID={userID}/> */}
-      {/* <Dashboard showNotification={showNotification} setUserToken={setUserToken} userID={userID}/> */}
-      {/* <Companies setUserToken={setUserToken} showNotification={showNotification} userID={userID}/> */}
-      <Profile setUserToken={setUserToken} showNotification={showNotification} userID={userID}/>
+      {/* <Calendar /> */}
+      {/* <Dashboard /> */}
+      {/* <Companies /> */}
+      {/* <Profile /> */}
+      <Users />
 
     </>
   )

@@ -1,19 +1,24 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
-import { useMutation } from '@apollo/client'
 import { v4 } from 'uuid';
 
 // Graphql
 import { REGISTER } from '../../../graphql/users/mutation'
 
+// Hooks
+import { useNotification } from '../../../graphql/hooks/useNotification'
+import { useCleanMutation } from '../../../graphql/hooks/useCleanMutation';
+
+// Context
+import { GlobalContext } from '../context/GlobalProvider'
+
 // Components
-import Button from '../Button.jsx'
 import Loader from '../Loader.jsx';
 
-export default function Register({
-  setIsLogin = f => f,
-  showNotification = f => f,
-}) {
+export default function Register() {
+
+  const { isLogin } = useContext(GlobalContext)
+  const [ isLoginValue, setIsLogin ] = isLogin
 
   const [ state, setState ] = useState('')
   const [ errors, setErrors ] = useState('')
@@ -29,7 +34,7 @@ export default function Register({
     setState(prevState => ({ ...prevState, [id]: value }));
   }
 
-  const [ register ] = useMutation(REGISTER, {
+  const register = useCleanMutation(REGISTER, {
     onCompleted(data) {
       if (data.register.errors) {
         setErrors(data.register.errors)
@@ -42,7 +47,7 @@ export default function Register({
       const extraClass = "notification-success"
       const title = "Registration Success"
       const message = 'Your account has been created, please activate it before log in.'
-      showNotification(extraClass, title, message)
+      useNotification(extraClass, title, message)
       setTimeout(() => {
         window.location.replace("/")
       }
@@ -52,15 +57,14 @@ export default function Register({
       const extraClass = "notification-error"
       const title = "No valid credentials"
       const message = "Please enter a valid username and password."
-      showNotification(extraClass, title, message)
-
+      useNotification(extraClass, title, message)
     }
   });
 
   const showLoader = () => {
     document.getElementsByTagName('button')[0].lastChild.textContent = ''
     document.getElementById('loader').style.display = 'flex'
-    register({ variables: { email: state.email, username: state.username, password1: state.password, password2: state.password2 }})
+    register({ email: state.email, username: state.username, password1: state.password, password2: state.password2 })
   }
 
   const showErrors = (type) => {
@@ -141,18 +145,17 @@ export default function Register({
           </label>
           {errors ? showErrors('password2') : ''}
         </div>
-        <Button
+        <button
           className='btn login-btn centered w-100'
-          label='Register'
-          function={showLoader}
-          variables={['email', 'username', 'password1', 'password2']}
-          param= {{ variables: { email: state.email, username: state.username, password1: state.password, password2: state.password2 }}}
-          iconClassName=""
-          icon=''
+          onClick={(e) => {
+            e.preventDefault()
+            showLoader({ email: state.email, username: state.username, password1: state.password, password2: state.password2 })}
+          }
           disabled={!state.email || !state.username || !state.password || !state.password2 ? true : false}
         >
-        <Loader />
-        </Button>
+          <Loader />
+          Register
+        </button>
         <div className='mt'>
           <Link onClick={() => setIsLogin(true)} to="/">Log in</Link>
         </div>

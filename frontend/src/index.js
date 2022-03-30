@@ -16,6 +16,9 @@ import {
 
 import { setContext } from '@apollo/client/link/context';
 
+// Context
+import GlobalProvider from '../src/components/context/GlobalProvider'
+
 const httpLink = createUploadLink({
   uri: 'http://127.0.0.1:8001/graphql'
 });
@@ -61,10 +64,9 @@ const client = new ApolloClient({
 
 ReactDOM.render(
   <ApolloProvider client={client}>
-    {/* <Provider store={store}> */}
-      {/* <Notification /> */}
+    <GlobalProvider>
       <App />
-    {/* </Provider> */}
+    </GlobalProvider>
   </ApolloProvider>,
   document.getElementById('root')
 );

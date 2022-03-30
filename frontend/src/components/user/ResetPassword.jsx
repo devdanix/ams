@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import { useMutation } from '@apollo/client'
 import { v4 } from 'uuid';
-
 
 // Graphql
 import { SEND_PASSWORD_RESET_EMAIL, PASSWORD_RESET } from '../../../graphql/users/mutation';
 
+// Hooks
+import { useNotification } from '../../../graphql/hooks/useNotification'
+import { useCleanMutation } from '../../../graphql/hooks/useCleanMutation';
+
 // Components
-import Button from '../Button.jsx'
 import Loader from '../Loader.jsx';
 
-export default function ResetPassword({
-  showNotification = f => f,
-}) {
+
+export default function ResetPassword() {
 
   const token = window.location.pathname.split('/')[2]
 
@@ -30,7 +30,7 @@ export default function ResetPassword({
     setState(prevState => ({ ...prevState, [id]: value }));
   }
 
-  const [ sendResetPasswordEmail ] = useMutation(SEND_PASSWORD_RESET_EMAIL, {
+  const sendResetPasswordEmail = useCleanMutation(SEND_PASSWORD_RESET_EMAIL, {
     onCompleted(data) {
       if (data.sendPasswordResetEmail.errors) {
         setErrors(data.sendPasswordResetEmail.errors)
@@ -43,7 +43,7 @@ export default function ResetPassword({
       const extraClass = "notification-success"
       const title = "Reset Password Email"
       const message = 'An email with the password reset link has been sent to the email address.'
-      showNotification(extraClass, title, message)
+      useNotification(extraClass, title, message)
       setTimeout(() => {
         window.location.replace("/")
       }
@@ -53,11 +53,11 @@ export default function ResetPassword({
       const extraClass = "notification-error"
       const title = "No valid credentials"
       const message = "Please enter a valid username and password."
-      showNotification(extraClass, title, message)
+      useNotification(extraClass, title, message)
     }
   });
 
-  const [ passwordReset ] = useMutation(PASSWORD_RESET, {
+  const passwordReset = useCleanMutation(PASSWORD_RESET, {
     onCompleted(data) {
       if (data.passwordReset.errors) {
         setErrors(data.passwordReset.errors)
@@ -70,7 +70,7 @@ export default function ResetPassword({
       const extraClass = "notification-success"
       const title = "Reset Password Success"
       const message = 'Your password has been resetted correctly.'
-      showNotification(extraClass, title, message)
+      useNotification(extraClass, title, message)
       setTimeout(() => {
         window.location.replace("/")
       }
@@ -80,7 +80,7 @@ export default function ResetPassword({
       const extraClass = "notification-error"
       const title = "Expired Token"
       const message = "Please resend the reset password email."
-      showNotification(extraClass, title, message)
+      useNotification(extraClass, title, message)
     }
   });
 
@@ -88,9 +88,9 @@ export default function ResetPassword({
     document.getElementsByTagName('button')[0].lastChild.textContent = ''
     document.getElementById('loader').style.display = 'flex'
     if (!token) {
-      sendResetPasswordEmail({ variables: { email: state.email }})
+      sendResetPasswordEmail({ email: state.email })
     } else {
-      passwordReset({ variables: { token: state.token, newPassword1: state.password, newPassword2: state.password2 }})
+      passwordReset({ token: state.token, newPassword1: state.password, newPassword2: state.password2 })
     }
   }
 
@@ -130,18 +130,17 @@ export default function ResetPassword({
             </label>
             {errors ? showErrors('email') : ''}
           </div>
-          <Button
+          <button
             className='btn login-btn centered w-100'
-            label='Send Link'
-            function={showLoader}
-            variables={['email']}
-            param= {{ variables: { email: state.email }}}
-            iconClassName=""
-            icon=''
+            onClick={(e) => {
+              e.preventDefault()
+              showLoader({ email: state.email })}
+            }
             disabled={!state.email ? true : false}
           >
-          <Loader />
-          </Button>
+            <Loader />
+            Send Link
+          </button>
         </>
         :
         <>
@@ -175,18 +174,17 @@ export default function ResetPassword({
             </label>
             {errors ? showErrors('newPassword2') : ''}
           </div>
-          <Button
+          <button
             className='btn login-btn centered w-100'
-            label='Reset Password'
-            function={showLoader}
-            variables={['token', 'newPassword1', 'newPassword2']}
-            param= {{ variables: { token: state.token, newPassword1: state.password, newPassword2: state.password2 }}}
-            iconClassName=""
-            icon=''
+            onClick={(e) => {
+              e.preventDefault()
+              showLoader({ token: state.token, newPassword1: state.password, newPassword2: state.password2  })}
+            }
             disabled={!state.password || !state.password2 ? true : false}
           >
-          <Loader />
-          </Button>
+            <Loader />
+            Reset Password
+          </button>
         </>
         }
       </form>

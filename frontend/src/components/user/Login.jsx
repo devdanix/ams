@@ -1,21 +1,25 @@
-import React, { useState, useRef } from 'react'
-import { useMutation } from '@apollo/client'
+import React, { useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
 
 // Graphql
 import { LOGIN } from '../../../graphql/users/mutation'
 
-// Components
-import Button from '../Button.jsx';
+// Hooks
+import { useNotification } from '../../../graphql/hooks/useNotification'
+import { useCleanMutation } from '../../../graphql/hooks/useCleanMutation';
+
+// Context
+import { GlobalContext } from '../context/GlobalProvider'
 
 
 export default function Login ({
-  showNotification = f => f,
-  setUserToken = f => f,
-  setIsLogin = f => f,
-  setUserID = f => f,
   inputRef = '',
 }) {
+
+  const { userToken, userIDContext, isLogin } = useContext(GlobalContext)
+  const [ userTokenValue, setUserToken ] = userToken
+  const [ userIDValue, setUserIDValue ] = userIDContext
+  const [ isLoginValue, setIsLogin ] = isLogin
 
   const [ state, setState ] = useState({username: ''})
 
@@ -30,7 +34,7 @@ export default function Login ({
     setState(prevState => ({ ...prevState, [id]: value }));
   }
 
-  const [ getToken ] = useMutation(LOGIN, {
+  const getToken = useCleanMutation(LOGIN, {
     onCompleted(data) {
       const userFound = data.tokenAuth.user
       const isVerified = userFound ? data.tokenAuth.user.verified : false
@@ -39,27 +43,27 @@ export default function Login ({
         const extraClass = "notification-success"
         const title = "Login"
         const message = `Welcome back ${username}.`
-        showNotification(extraClass, title, message)
+        useNotification(extraClass, title, message)
+        setUserIDValue(data.tokenAuth.user.pk)
         setUserToken(data.tokenAuth.token)
-        setUserID(data.tokenAuth.user.pk)
         // localStorage.setItem('token', data.tokenAuth.token)
       } else if(!userFound) {
         const extraClass = "notification-error"
         const title = "Account Error"
         const message = "The account has not been found. Please register a new account."
-        showNotification(extraClass, title, message)
+        useNotification(extraClass, title, message)
       } else if(userFound && !isVerified) {
         const extraClass = "notification-error"
         const title = "Account Verification Failed"
         const message = "The account has not been verified yet. Please check your email and activate it."
-        showNotification(extraClass, title, message)
+        useNotification(extraClass, title, message)
       }
     },
     onError(){
       const extraClass = "notification-error"
       const title = "No valid credentials"
       const message = "Please enter a valid username and password."
-      showNotification(extraClass, title, message)
+      useNotification(extraClass, title, message)
     }
   });
 
@@ -96,16 +100,16 @@ export default function Login ({
               Password
             </label>
         </div>
-        <Button
+        <button
           className='btn login-btn centered w-100'
-          label='Login'
-          function={getToken}
-          variables={['username', 'password']}
-          param= {{ variables: { username: state.username, password: state.password }}}
-          iconClassName=""
-          icon=''
+          onClick={(e) => {
+            e.preventDefault()
+            getToken({ username: state.username, password: state.password })}
+          }
           disabled={!state.username || !state.password ? true : false}
-        />
+        >
+          Login
+        </button>
         <div className='mt-x2'>
           Don't have an account? Register <Link onClick={() => setIsLogin(false)} to="/register">here.</Link>
         </div>

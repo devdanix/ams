@@ -9,6 +9,7 @@ export default function Pagination({
   setCurrentPage = f => f
 }) {
 
+
   const totalPageCount = Math.round(data.length / pageSize )
   const siblingsCount = 1
   const totalPageNumbers = siblingsCount + 5
@@ -28,8 +29,8 @@ export default function Pagination({
     setCurrentPage(currentPage - 1);
   };
 
-  const leftSiblingIndex = Math.max(currentPage - siblingsCount, 1);
-  const rightSiblingIndex = Math.min(currentPage + siblingsCount, totalPageCount)
+  const leftSiblingIndex = Math.max(currentPage - 1 - siblingsCount, 1);
+  const rightSiblingIndex = Math.min(currentPage - 1 + siblingsCount, totalPageCount)
   const shouldShowLeftDots = leftSiblingIndex > 2
   const shouldShowRightDots = rightSiblingIndex < totalPageCount - 2
   const firstPageIndex = 1
@@ -81,7 +82,7 @@ export default function Pagination({
         <li key={uuidv4()} className="pagination-item">
           <div className={classnames(
           "arrow left",
-          {disabled: currentPage === 0 }
+          {disabled: currentPage === 1 }
           )}
           onClick={onPrevious} />
         </li>

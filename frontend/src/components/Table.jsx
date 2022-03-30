@@ -11,7 +11,7 @@ import Pagination from './Pagination.jsx'
 
 export default function Table(props) {
 
-  const [ currentPage, setCurrentPage ] = useState(0)
+  const [ currentPage, setCurrentPage ] = useState(1)
   // const [ pageSize, setPageSize ] = useState(18)
   const [ inputFilters, setInputFilter ] = useState({})
   const [ currentInputFiltersValue, setCurrentInputFilterValue ] = useState('')
@@ -28,8 +28,8 @@ export default function Table(props) {
   },[currentPage, inputFilters]);
 
   const currentTableData = (data) => {
-    const pageFrom = currentPage == 0 ? 0 : currentPage * pageSize
-    const pageTo = currentPage == 0 ? pageSize : (currentPage * pageSize) + pageSize
+    const pageFrom = currentPage == 0 ? 0 : (currentPage - 1) * pageSize
+    const pageTo = currentPage == 0 ? pageSize : ((currentPage - 1) * pageSize) + pageSize
     return data.slice(pageFrom , pageTo);
   }
 
@@ -44,79 +44,38 @@ export default function Table(props) {
       prop = props[i];
 
       let item = obj[prop];
-      if (item !== undefined) {
+      if (item !== undefined && typeof(item) !== "boolean") {
         obj = item;
+      } else if (typeof(item) === "boolean") {
+        let temp = new Boolean(item)
+        obj = temp.toString()
       } else {
-        break;
+        break
       }
     }
     return obj;
   }
 
-  const sortTable = (key, subKey) => {
-    key = key.toLowerCase()
+  const sortTable = (key) => {
     let newTable = table.slice()
-    if (subKey) {
-      if(sort == 'asc'){
-        if(prevSort == key) {
-          newTable.sort((a,b) => {
-            if (isNaN(b[key])){
-              return b[key][subKey].localeCompare(a[key][subKey])
-            } else {
-              return parseInt(b[key][subKey]) > parseInt(a[key][subKey])
-            }
-          })
-          setSort('desc')
-        } else {
-          newTable.sort((a,b) => {
-            if (isNaN(a[key])) {
-              return a[key][subKey].localeCompare(b[key][subKey])
-            } else {
-              return parseInt(a[key][subKey]) > parseInt(b[key][subKey])
-            }
-          })
-        }
+    newTable.sort((a, b) => {
+      if(sort === 'asc') {
+        // Sort desc
+        if(a[key] === null || a[key] === '') return 1
+        if(b[key] === null || b[key] === '') return -1
+        if (a[key] === b[key]) return 0
+        if(isNaN(a[key]) || typeof(a[key]) === 'boolean') return a[key] < b[key] ? 1 : -1
+        return parseInt(a[key]) < parseInt(b[key]) ? 1 : -1;
       } else {
-        newTable.sort((a,b) => {
-          if (isNaN(a[key])) {
-            return a[key][subKey].localeCompare(b[key][subKey])
-          } else {
-            return parseInt(a[key][subKey]) > parseInt(b[key][subKey])
-          }
-        })
-        setSort('asc')
+        // Sort asc
+        if(a[key] === null || a[key] === '') return -1
+        if(b[key] === null || b[key] === '') return 1
+        if (a[key] === b[key]) return 0
+        if(isNaN(a[key]) || typeof(a[key]) === 'boolean') return a[key] < b[key] ? -1 : 1
+        return parseInt(a[key]) < parseInt(b[key]) ? -1 : 1;
       }
-    } else {
-      if(sort == 'asc'){
-        if(prevSort == key) {
-          newTable.sort((a,b) => {
-            if (isNaN(b[key])){
-              return b[key].localeCompare(a[key])
-            } else {
-              return parseInt(b[key]) > parseInt(a[key])
-            }
-          })
-          setSort('desc')
-        } else {
-          newTable.sort((a,b) => {
-            if (isNaN(a[key])) {
-              return a[key].localeCompare(b[key])
-            } else {
-              return parseInt(a[key]) > parseInt(b[key])
-            }
-          })
-        }
-      } else {
-        newTable.sort((a,b) => {
-          if (isNaN(a[key])) {
-            return a[key].localeCompare(b[key])
-          } else {
-            return parseInt(a[key]) > parseInt(b[key])
-          }
-        })
-        setSort('asc')
-      }
-    }
+    })
+    setSort(sort === 'asc' ? 'desc' : 'asc')
     setPrevSort(key)
     setTable(newTable)
   }
@@ -144,15 +103,17 @@ export default function Table(props) {
     for (const property in inputFilters) {
       loopTable = []
       result.filter((obj) => {
-        if(obj[property].toLowerCase().includes(inputFilters[property])){
-          loopTable.push(obj)
+        if(obj[property]) {
+          if(obj[property].toString().toLowerCase().includes(inputFilters[property])){
+            loopTable.push(obj)
+          }
         }
         result = loopTable
       })
     }
     setTable(currentTableData(result))
     setFilterTable(result)
-    setCurrentPage(0)
+    setCurrentPage(1)
   }, [inputFilters, currentInputFiltersHeading, currentInputFiltersValue])
 
   const searchColumnInput = props.heading.map((heading, index) => {
@@ -163,7 +124,7 @@ export default function Table(props) {
             className="search-input"
             onChange={(e) => {
               e.preventDefault()
-              searchColumn(e.target.value, heading.header.toLowerCase())
+              searchColumn(e.target.value, heading.sortBy)
             }}
             placeholder={`Search ${filterTable.length} records..`}></input>
         </th>
@@ -176,13 +137,13 @@ export default function Table(props) {
   const tableHeadings = props.heading.map((heading, index) => {
     let sortIcon, sortIconClass = ''
     if (heading.allowSort) {
-      if (prevSort == heading.header.toLowerCase() && sort == 'asc') {
+      if (prevSort == heading.sortBy && sort === 'asc') {
         sortIcon = 'faSortUp'
         sortIconClass = 'sort-active'
-      } else if (prevSort == heading.header.toLowerCase() && sort == 'desc') {
+      } else if (prevSort == heading.sortBy && sort === 'desc') {
         sortIcon = 'faSortDown'
         sortIconClass = 'sort-active'
-      } else if (heading.header) {
+      } else if (heading.sortBy) {
         sortIcon = 'faSort'
         sortIconClass = 'sort-inactive'
       }
@@ -208,7 +169,6 @@ export default function Table(props) {
 
   const tableRows = table.map((record, index) => {
     let field = props.content.map((item, index) => {
-
       if (item.type == 'field') {
         return (
           <td
@@ -266,10 +226,10 @@ export default function Table(props) {
       <table id={tableID} className={props.className}>
         <thead>
           <tr>
-            {searchColumnInput}
+            {tableHeadings}
           </tr>
           <tr>
-            {tableHeadings}
+            {searchColumnInput}
           </tr>
         </thead>
         <tbody>

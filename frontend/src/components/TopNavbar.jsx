@@ -1,12 +1,18 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
 // Components
 import Dropdown from './Dropdown.jsx';
 
+// Context
+import { GlobalContext } from './context/GlobalProvider.js';
+
 export default function TopNavbar({
-  setUserToken = f => f,
   viewTitle = ''
 }) {
+
+  const { userToken } = useContext(GlobalContext)
+  const [ userTokenValue, setUserToken ] = userToken
+
 
   const logout = () => {
     setUserToken('')

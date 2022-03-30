@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { useQuery } from '@apollo/client';
 import { v4 } from 'uuid';
 
@@ -12,13 +12,15 @@ import { UPDATE_USER } from '../../graphql/users/mutation'
 
 // Custom Hooks
 import { useCleanMutation } from '../../graphql/hooks/useCleanMutation.js';
+import { useNotification } from '../../graphql/hooks/useNotification.js';
 
+// Context
+import { GlobalContext } from './context/GlobalProvider.js';
 
-export default function Profile({
-  userID = '',
-  setUserToken = f => f,
-  showNotification = f => f,
-}) {
+export default function Profile() {
+
+  const { userIDContext } = useContext(GlobalContext)
+  const [ userIDValue, setUserIDValue ] = userIDContext
 
   const [ state, setState ] = useState({
     username: '',
@@ -39,17 +41,19 @@ export default function Profile({
       const extraClass = "notification-success"
       const title = "Update Account"
       const message = `Your account has been updated correctly.`
-      showNotification(extraClass, title, message)
+      useNotification(extraClass, title, message)
     },
     onError(error) {
       const extraClass = "notification-error"
       const title = "Update Account"
       const message = `Has not been possible to update your account due to the highlighted errors.`
-      showNotification(extraClass, title, message)
+      useNotification(extraClass, title, message)
     },
     refetchQueries: [
-      GET_SINGLE_USER_BY_ID,
-      userID = userID
+      {
+        query: GET_SINGLE_USER_BY_ID,
+        variables: {userID: userIDValue}
+      }
     ],
   })
 
@@ -80,11 +84,11 @@ export default function Profile({
 
   const { loading, error, data } = useQuery(GET_SINGLE_USER_BY_ID, {
     variables: {
-      id: userID || 1
+      id: userIDValue || 1
     },
     onCompleted(data) {
       setState({
-        userID: userID || 1 ,
+        userID: userIDValue || 1 ,
         username: data.singleUser.username,
         firstName: data.singleUser.firstName,
         lastName: data.singleUser.lastName,
@@ -98,7 +102,7 @@ export default function Profile({
 
   return (
     <div className="wrapper">
-      <TopNavbar viewTitle='Profile' setUserToken={setUserToken}/>
+      <TopNavbar viewTitle='Profile' />
         <div className='w-100'>
         <form id="form-profile" className="form-wrapper centered">
           <div className='entry-wrapper relative'>
@@ -169,14 +173,14 @@ export default function Profile({
           </div>
           <div className='flex jcsb mb-x2'>
             <img className='user-img' src={data.singleUser.image ? `media/${data.singleUser.image}` : 'media/default-user-image.png'} />
-            <Upload query={GET_SINGLE_USER_BY_ID} queryVariables={{id: userID || 1}} userID={userID || 1}/>
+            <Upload query={GET_SINGLE_USER_BY_ID} queryVariables={{id: userIDValue || 1}} userID={userIDValue || 1}/>
           </div>
           <button
               className='btn login-btn w-30'
               onClick={(e) => {
                 e.preventDefault()
                 updateUserMutation({
-                  userID: userID || 1,
+                  userID: userIDValue || 1,
                   username: state.username,
                   email: state.email,
                   firstName: state.firstName,

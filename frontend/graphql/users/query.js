@@ -46,24 +46,25 @@ query me{
 `;
 
 
-
-
-
-
-
-// export const GET_SINGLE_USER = gql`
-// query users($username:String){
-//   users(username:$username, status_Verified: true) {
-//     edges {
-//       node {
-//         id,
-//         username,
-//         archived,
-//         verified,
-//         email,
-//         secondaryEmail,
-//       }
-//     }
-//   }
-// }
-// `;
+export const ALL_USERS = gql`
+query users{
+  users{
+    edges {
+      node {
+        id,
+        pk,
+        username,
+        firstName,
+        lastName
+        archived,
+        verified,
+        email,
+        secondaryEmail,
+        isStaff
+        isActive
+        isSuperuser
+      }
+    }
+  }
+}
+`

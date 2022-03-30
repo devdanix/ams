@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useQuery } from '@apollo/client'
 import { v4 as uuidv4 } from 'uuid';
 
 // Custom Hooks
 import { useCleanMutation } from '../../graphql/hooks/useCleanMutation.js';
+import { useNotification } from '../../graphql/hooks/useNotification.js';
 
 // Fullcalendar
 import FullCalendar from '@fullcalendar/react' // must go before plugins
@@ -13,7 +14,6 @@ import interactionPlugin from '@fullcalendar/interaction'; // for selectable
 
 // Components
 import TopNavbar from './TopNavbar.jsx'
-// import ModalWindow from './ModalWindow.jsx'
 import DatePicker from './DatePicker.jsx';
 import Picker from './Picker.jsx';
 
@@ -21,20 +21,18 @@ import Picker from './Picker.jsx';
 import { USER_EVENTS } from '../../graphql/events/query';
 import { UPDATE_EVENT, ADD_EVENT, DELETE_EVENT } from '../../graphql/events/mutation';
 
+// Context
+import { GlobalContext } from './context/GlobalProvider.js';
 
-export default function Calendar({
-  setUserToken = f => f,
-  showNotification = f => f,
-  userID = ''
-}) {
+
+export default function Calendar() {
+
+  const { userIDContext } = useContext(GlobalContext)
+  const [ userIDValue, setUserIDValue ] = userIDContext
 
   const [ state, setState ] = useState({
     allDay: false
   })
-
-  // let handleColor = (time) => {
-  //   return time.getHours() > 12 ? "text-success" : "text-error";
-  // };
 
   // Graphql Mutations
   const updateEventMutation = useCleanMutation(UPDATE_EVENT, {
@@ -43,14 +41,16 @@ export default function Calendar({
       const extraClass = "notification-success"
       const title = "Update Event"
       const message = `The event has been updated correctly.`
-      showNotification(extraClass, title, message)
+      useNotification(extraClass, title, message)
     },
     onError(error) {
       // console.log(error)
     },
     refetchQueries: [
-      USER_EVENTS,
-      userID = userID
+      {
+        query: USER_EVENTS,
+        variables: {userID: userIDValue}
+      }
     ],
   })
 
@@ -60,17 +60,19 @@ export default function Calendar({
       const extraClass = "notification-success"
       const title = "Delete Event"
       const message = `The event has been deleted correctly.`
-      showNotification(extraClass, title, message)
+      useNotification(extraClass, title, message)
     },
     onError(error) {
       const extraClass = "notification-error"
       const title = "Delete Event Error"
       const message = `There was an error deleting the event.`
-      showNotification(extraClass, title, message)
+      useNotification(extraClass, title, message)
     },
     refetchQueries: [
-      USER_EVENTS,
-      userID = userID
+      {
+        query: USER_EVENTS,
+        variables: {userID: userIDValue}
+      }
     ],
   })
 
@@ -80,17 +82,19 @@ export default function Calendar({
       const extraClass = "notification-success"
       const title = "Add Event"
       const message = `The new event has been added correctly.`
-      showNotification(extraClass, title, message)
+      useNotification(extraClass, title, message)
     },
     onError(error) {
       const extraClass = "notification-error"
       const title = "Add Event Error"
       const message = `There was an error adding the event.`
-      showNotification(extraClass, title, message)
+      useNotification(extraClass, title, message)
     },
     refetchQueries: [
-      USER_EVENTS,
-      userID = userID
+      {
+        query: USER_EVENTS,
+        variables: {userID: userIDValue}
+      }
     ],
   })
 
@@ -211,7 +215,7 @@ export default function Calendar({
                   allDay: state.allDay,
                   start: state.startDate.toISOString(),
                   end: state.endDate.toISOString(),
-                  userID: userID || 1
+                  userID: userIDValue || 1
                 })}
               }
               disabled={!state.title || state.startDate > state.endDate ? true : false}
@@ -339,7 +343,7 @@ export default function Calendar({
                   allDay: state.allDay,
                   start: state.startDate.toISOString(),
                   end: state.endDate.toISOString(),
-                  userID: userID || 1,
+                  userID: userIDValue || 1,
                   companyID: state.company
                 })}
               }
@@ -352,7 +356,7 @@ export default function Calendar({
   }
 
   const { loading, error, data } = useQuery(USER_EVENTS, {
-    variables: { userID: userID || 1}
+    variables: { userID: userIDValue || 1}
   });
 
   if (loading) return 'Loading...';
@@ -360,7 +364,7 @@ export default function Calendar({
 
   return (
     <div className="wrapper">
-      <TopNavbar viewTitle={'Calendar'} setUserToken={setUserToken}/>
+      <TopNavbar viewTitle={'Calendar'} />
       <div id="calendar" className="mt w-95 centered">
         <div id="modalWindow" className="modal">
           {state.onSelectEvent ? addEventForm() : ''}
@@ -435,7 +439,7 @@ export default function Calendar({
               allDay: false,
               start: info.event.start.toISOString(),
               end: info.event.end ? info.event.end.toISOString() : info.event.start.toISOString(),
-              userID: userID || 1,
+              userID: userIDValue || 1,
               companyID: info.event._def.extendedProps.companyFK.id,
             }
             if(info.event.allDay){
@@ -451,7 +455,7 @@ export default function Calendar({
               allDay: false,
               start: info.event.start.toISOString(),
               end: info.event.end ? info.event.end.toISOString() : info.event.start.toISOString(),
-              userID: userID || 1,
+              userID: userIDValue || 1,
               companyID: info.event._def.extendedProps.companyFK.id,
             }
             if(info.event.allDay){
