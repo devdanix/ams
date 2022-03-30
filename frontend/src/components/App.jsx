@@ -73,9 +73,8 @@ function App() {
     <>
       <div id="notification" />
       <BrowserRouter>
-        <Navbar/>
-          {getRoutes()}
-       </BrowserRouter>
+        {getRoutes()}
+      </BrowserRouter>
     </>
   )
 }
